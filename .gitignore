@@ -1,0 +1,18 @@
+# Binaries
+/jsonql
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+*.exe
+
+# Vendor (if used)
+vendor/
