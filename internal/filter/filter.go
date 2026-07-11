@@ -4,6 +4,7 @@ package filter
 
 import (
 	"fmt"
+	"regexp"
 	"sort"
 	"strings"
 )
@@ -138,6 +139,7 @@ func tokenize(expr string) ([]token, error) {
 		}{
 			{"and", tokenAnd}, {"or", tokenOr}, {"not", tokenNot},
 			{"contains", tokenOp}, {"startsWith", tokenOp}, {"endsWith", tokenOp},
+			{"matches", tokenOp},
 		} {
 			prefix := kw.name + " "
 			if expr == kw.name || strings.HasPrefix(expr, prefix) {
@@ -439,6 +441,18 @@ func parseAtomState(ps *parserState) (*node, error) {
 				value:  strVal,
 			}, nil
 		}
+		if nextTok.typ == tokenOp && nextTok.value == "matches" && ps.remaining() >= 3 && ps.tokens[ps.idx+2].typ == tokenString {
+			strVal := ps.tokens[ps.idx+2].value
+			ps.advance()
+			ps.advance()
+			ps.advance()
+			return &node{
+				typ:    nodeStrMethod,
+				method: "matches",
+				field:  tok.value,
+				value:  strVal,
+			}, nil
+		}
 	}
 	_ = tok // re-read after advance checks
 	tok = ps.tokens[ps.idx]
@@ -708,6 +722,12 @@ func matchStrMethod(obj map[string]interface{}, field, method, value string) boo
 		return strings.HasPrefix(str, value)
 	case "endsWith":
 		return strings.HasSuffix(str, value)
+	case "matches":
+		matched, err := regexp.MatchString(value, str)
+		if err != nil {
+			return false
+		}
+		return matched
 	}
 	return false
 }

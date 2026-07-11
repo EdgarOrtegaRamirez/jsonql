@@ -10,7 +10,7 @@ Ergonomic JSON query CLI — simple path syntax, filtering, sorting, and multipl
 
 - **Simple path queries** — `users[*].name` extracts names from an array of objects
 - **Filter expressions** — `age > 25 and city == "NYC"` with natural `and`/`or`/`not` keywords
-- **String methods** — `name contains "Smith"`, `email startsWith "alice"`, `path endsWith ".json"`
+- **String methods** — `name contains "Smith"`, `email startsWith "alice"`, `path endsWith ".json"`, `email matches ".*\\.com$"` with regex support
 - **Sorting** — `--sort age --sort-desc` for descending order
 - **Limiting** — `--limit 10` to cap results
 - **Multiple output formats** — JSON (pretty/compact), JSONL, human-readable text
@@ -60,6 +60,12 @@ cat data.json | jsonql --path users
 
 # Complex filter with string methods
 jsonql --path 'logs[*]' --filter 'level contains "ERROR"' data.json
+
+# Regex filter (match emails ending in .com)
+jsonql --path 'users[*]' --filter 'email matches ".*\\.com$"' data.json
+
+# Regex filter (match phone numbers starting with 555)
+jsonql --path 'contacts[*]' --filter 'phone matches "^555-"' data.json
 ```
 
 ## Commands
@@ -111,6 +117,7 @@ jsonql info [file...]
 | `field contains "str"` | String contains substring |
 | `field startsWith "str"` | String starts with prefix |
 | `field endsWith "str"` | String ends with suffix |
+| `field matches "regex"` | String matches regex pattern |
 | `expr and expr` | Logical AND |
 | `expr or expr` | Logical OR |
 | `not expr` | Logical NOT |
